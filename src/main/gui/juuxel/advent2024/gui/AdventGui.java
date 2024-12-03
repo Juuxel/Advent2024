@@ -1,14 +1,15 @@
 package juuxel.advent2024.gui;
 
 import juuxel.advent2024.*;
-import org.cactoos.io.OutputStreamTo;
-import org.cactoos.io.TeeOutputStream;
+import org.apache.commons.io.output.TeeOutputStream;
+import org.apache.commons.io.output.WriterOutputStream;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -139,9 +140,8 @@ public final class AdventGui {
             loadToday.addActionListener(e -> setData.accept(solutions.getSelectedValue().day()));
 
             Writer outputWriter = new TextAreaWriter(output);
-            // Sorry Yegor, but this is not "OO". Cactoos' IO converters are just too convenient, though ;)
-            System.setOut(new PrintStream(new TeeOutputStream(System.out, new OutputStreamTo(outputWriter))));
-            System.setErr(new PrintStream(new TeeOutputStream(System.err, new OutputStreamTo(outputWriter))));
+            System.setOut(new PrintStream(attachWriter(System.out, outputWriter)));
+            System.setErr(new PrintStream(attachWriter(System.err, outputWriter)));
 
             panel.add(mainSplit, BorderLayout.CENTER);
             panel.add(run, BorderLayout.SOUTH);
@@ -151,6 +151,10 @@ public final class AdventGui {
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setVisible(true);
         });
+    }
+
+    private static OutputStream attachWriter(OutputStream out, Writer writer) {
+        return new TeeOutputStream(out, WriterOutputStream.builder().setWriter(writer).getUnchecked());
     }
 
     private static Runnable timed(String input, Solution solution) {
