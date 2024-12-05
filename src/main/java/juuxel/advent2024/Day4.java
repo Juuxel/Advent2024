@@ -47,19 +47,17 @@ public final class Day4 {
         var height = grid.size();
         int found = 0;
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 1; x < width - 1; x++) {
+            for (int y = 1; y < height - 1; y++) {
                 char start = grid.get(y).charAt(x);
                 if (start == 'A') {
-                    if (1 <= x && x < width - 1 && 1 <= y && y < height - 1) {
-                        char tl = grid.get(y - 1).charAt(x - 1);
-                        char tr = grid.get(y - 1).charAt(x + 1);
-                        char bl = grid.get(y + 1).charAt(x - 1);
-                        char br = grid.get(y + 1).charAt(x + 1);
-                        if ((tl == 'S' && br == 'M') || (br == 'S' && tl == 'M')) {
-                            if ((tr == 'S' && bl == 'M') || (bl == 'S' && tr == 'M')) {
-                                found++;
-                            }
+                    char tl = grid.get(y - 1).charAt(x - 1);
+                    char tr = grid.get(y - 1).charAt(x + 1);
+                    char bl = grid.get(y + 1).charAt(x - 1);
+                    char br = grid.get(y + 1).charAt(x + 1);
+                    if ((tl == 'S' && br == 'M') || (br == 'S' && tl == 'M')) {
+                        if ((tr == 'S' && bl == 'M') || (bl == 'S' && tr == 'M')) {
+                            found++;
                         }
                     }
                 }
