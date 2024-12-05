@@ -34,12 +34,7 @@ public final class Day5 {
         int part2 = 0;
         for (Update update : updates) {
             if (update.isInCorrectOrder(orderings)) continue;
-
-            do {
-                update = update.fixOrder(orderings);
-            } while (!update.isInCorrectOrder(orderings));
-
-            part2 += update.middlePage();
+            part2 += update.fixOrder(orderings).middlePage();
         }
         System.out.println(part2);
     }
