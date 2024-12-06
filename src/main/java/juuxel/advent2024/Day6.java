@@ -84,13 +84,14 @@ public final class Day6 {
                 }
 
                 markCurrentPos();
-                onEachStep();
 
                 while (isWithinBounds(guardX + guardDirection.offsetX, guardY + guardDirection.offsetY, data.width, data.height)
                     && hasObstacleAt(guardX + guardDirection.offsetX, guardY + guardDirection.offsetY)) {
                     guardDirection = guardDirection.rotate();
                     markCurrentPos();
                 }
+
+                onEachStep();
 
                 guardX += guardDirection.offsetX;
                 guardY += guardDirection.offsetY;
@@ -123,10 +124,10 @@ public final class Day6 {
             if (isWithinBounds(frontX, frontY, data.width, data.height) && !hasObstacleAt(frontX, frontY)
                 && !newObstacles[frontX][frontY]
                 && !(frontX == data.guardStartX && frontY == data.guardStartY)) {
-                // Let's add the obstacle and then move forward to see if we encounter a possible loop.
+                // Let's add the obstacle and then move *from the start* to see if we encounter a possible loop.
                 var subdata = data.copy();
                 subdata.obstacles[frontX][frontY] = true;
-                var submovement = new GuardMovement(subdata, guardX, guardY, guardDirection);
+                var submovement = new GuardMovement(subdata);
                 if (submovement.simulate()) {
                     newObstacles[frontX][frontY] = true;
                     possibleObstacles++;
