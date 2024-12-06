@@ -121,25 +121,18 @@ public final class Day6 {
 
             if (!newObstacles[guardX][guardY] && !(guardX == data.guardStartX && guardY == data.guardStartY)) {
                 // Let's add the obstacle and then move *from the start* to see if we encounter a possible loop.
-                var subdata = data.copy();
-                subdata.obstacles[guardX][guardY] = true;
-                var submovement = new GuardMovement(subdata);
+                data.obstacles[guardX][guardY] = true;
+                var submovement = new GuardMovement(data);
                 if (submovement.simulate()) {
                     newObstacles[guardX][guardY] = true;
                     possibleObstacles++;
                 }
+                data.obstacles[guardX][guardY] = false;
             }
         }
     }
 
     private record Data(int width, int height, boolean[][] obstacles, int guardStartX, int guardStartY) {
-        Data copy() {
-            boolean[][] newObstacles = new boolean[width][];
-            for (int x = 0; x < width; x++) {
-                newObstacles[x] = obstacles[x].clone();
-            }
-            return new Data(width, height, newObstacles, guardStartX, guardStartY);
-        }
     }
 
     private enum Direction {
