@@ -3,6 +3,8 @@ package juuxel.advent2024;
 import java.util.stream.Stream;
 
 public final class Day6 {
+    private static final Direction START_DIRECTION = Direction.UP;
+
     public static void main(String[] args) throws Exception {
         part1(Loader.lines(6));
         part2(Loader.lines(6));
@@ -33,29 +35,23 @@ public final class Day6 {
         boolean[][] obstacles = new boolean[width][height];
         int guardStartX = 0;
         int guardStartY = 0;
-        Direction guardStartDirection = null;
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 char c = lineList.get(y).charAt(x);
                 switch (c) {
                     case '#' -> obstacles[x][y] = true;
-                    case '^', '<', 'v', '>' -> {
+                    case '^' -> {
                         guardStartX = x;
                         guardStartY = y;
-                        guardStartDirection = switch (c) {
-                            case '<' -> Direction.LEFT;
-                            case '>' -> Direction.RIGHT;
-                            case '^' -> Direction.UP;
-                            case 'v' -> Direction.DOWN;
-                            default -> throw new AssertionError();
-                        };
                     }
+                    case '.' -> {} // ignore
+                    default -> throw new IllegalArgumentException("Unknown char in map: " + c);
                 }
             }
         }
 
-        return new Data(width, height, obstacles, guardStartX, guardStartY, guardStartDirection);
+        return new Data(width, height, obstacles, guardStartX, guardStartY);
     }
 
     private static abstract class GuardMovement {
@@ -103,7 +99,7 @@ public final class Day6 {
         int visitCount = 0;
 
         Part1GuardMovement(Data data) {
-            super(data, data.guardStartX, data.guardStartY, data.guardStartDirection);
+            super(data, data.guardStartX, data.guardStartY, START_DIRECTION);
             visited = new boolean[data.width][data.height];
         }
 
@@ -149,7 +145,7 @@ public final class Day6 {
         int possibleObstacles = 0;
 
         Part2OuterGuardMovement(Data data) {
-            super(data, data.guardStartX, data.guardStartY, data.guardStartDirection);
+            super(data, data.guardStartX, data.guardStartY, START_DIRECTION);
             newObstacles = new boolean[data.width][data.height];
         }
 
@@ -227,7 +223,7 @@ public final class Day6 {
     }
 
     private static void printMap(Data data, int[][] visited, boolean[][] newObstacles) {
-        printMap(data, visited, newObstacles, data.guardStartX, data.guardStartY, data.guardStartDirection, -1, -1);
+        printMap(data, visited, newObstacles, data.guardStartX, data.guardStartY, START_DIRECTION, -1, -1);
     }
 
     private static void printMap(Data data, int[][] visited, boolean[][] newObstacles, int startX, int startY, Direction startDirection, int loopX, int loopY) {
@@ -260,7 +256,7 @@ public final class Day6 {
         }
     }
 
-    private record Data(int width, int height, boolean[][] obstacles, int guardStartX, int guardStartY, Direction guardStartDirection) {
+    private record Data(int width, int height, boolean[][] obstacles, int guardStartX, int guardStartY) {
     }
 
     private enum Direction {
