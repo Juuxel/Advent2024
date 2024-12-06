@@ -162,14 +162,5 @@ public final class Day6 {
                 case LEFT -> UP;
             };
         }
-
-        char symbol() {
-            return switch (this) {
-                case UP -> '^';
-                case RIGHT -> '>';
-                case DOWN -> 'v';
-                case LEFT -> '<';
-            };
-        }
     }
 }
