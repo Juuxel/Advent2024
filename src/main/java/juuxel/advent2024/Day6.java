@@ -6,26 +6,19 @@ public final class Day6 {
     private static final Direction START_DIRECTION = Direction.UP;
 
     public static void main(String[] args) throws Exception {
-        part1(Loader.lines(6));
-        part2(Loader.lines(6));
+        run(Loader.lines(6));
     }
 
-    public static void part1(Stream<String> lines) {
+    public static void run(Stream<String> lines) {
         var data = readData(lines);
-        var movement = new Part1GuardMovement(data);
+        var movement = new Part2OuterGuardMovement(data);
         movement.simulate();
-        System.out.println(movement.visitCount);
+        System.out.println(movement.uniqueVisits);
+        System.out.println(movement.possibleObstacles);
     }
 
     private static boolean isWithinBounds(int x, int y, int width, int height) {
         return 0 <= x && x < width && 0 <= y && y < height;
-    }
-
-    public static void part2(Stream<String> lines) {
-        var data = readData(lines);
-        var movement = new Part2OuterGuardMovement(data);
-        movement.simulate();
-        System.out.println(movement.possibleObstacles);
     }
 
     private static Data readData(Stream<String> lines) {
@@ -54,104 +47,71 @@ public final class Day6 {
         return new Data(width, height, obstacles, guardStartX, guardStartY);
     }
 
-    private static abstract class GuardMovement {
+    private static class GuardMovement {
         protected final Data data;
         protected int guardX;
         protected int guardY;
         protected Direction guardDirection;
+
+        protected final int[][] visits;
+        int uniqueVisits = 0;
+
+        protected GuardMovement(Data data) {
+            this(data, data.guardStartX, data.guardStartY, START_DIRECTION);
+        }
 
         protected GuardMovement(Data data, int guardX, int guardY, Direction guardDirection) {
             this.data = data;
             this.guardX = guardX;
             this.guardY = guardY;
             this.guardDirection = guardDirection;
+            visits = new int[data.width][data.height];
         }
 
         protected boolean hasObstacleAt(int x, int y) {
             return data.obstacles[x][y];
         }
 
-        protected abstract boolean shouldContinue();
-        protected abstract void onEachStep();
-        protected void onRotate(int obstacleX, int obstacleY) {
+        protected void onEachStep() {
         }
 
-        protected void simulate() {
-            while (isWithinBounds(guardX, guardY, data.width, data.height) && shouldContinue()) {
+        protected boolean simulate() {
+            while (isWithinBounds(guardX, guardY, data.width, data.height)) {
+                if (visits[guardX][guardY] == 0) {
+                    uniqueVisits++;
+                } else if ((visits[guardX][guardY] & guardDirection.mask) != 0) {
+                    return true; // we found a loop
+                }
+
+                markCurrentPos();
                 onEachStep();
 
                 while (isWithinBounds(guardX + guardDirection.offsetX, guardY + guardDirection.offsetY, data.width, data.height)
                     && hasObstacleAt(guardX + guardDirection.offsetX, guardY + guardDirection.offsetY)) {
-                    int obstacleX = guardX + guardDirection.offsetX;
-                    int obstacleY = guardY + guardDirection.offsetY;
                     guardDirection = guardDirection.rotate();
-                    onRotate(obstacleX, obstacleY);
+                    markCurrentPos();
                 }
 
                 guardX += guardDirection.offsetX;
                 guardY += guardDirection.offsetY;
             }
-        }
-    }
 
-    private static final class Part1GuardMovement extends GuardMovement {
-        private final boolean[][] visited;
-        int visitCount = 0;
-
-        Part1GuardMovement(Data data) {
-            super(data, data.guardStartX, data.guardStartY, START_DIRECTION);
-            visited = new boolean[data.width][data.height];
-        }
-
-        @Override
-        protected boolean shouldContinue() {
-            return true;
-        }
-
-        @Override
-        protected void onEachStep() {
-            if (!visited[guardX][guardY]) {
-                visited[guardX][guardY] = true;
-                visitCount++;
-            }
-        }
-    }
-
-    private static abstract class Part2GuardMovement extends GuardMovement {
-        protected final int[][] visited;
-
-        protected Part2GuardMovement(Data data, int guardX, int guardY, Direction guardDirection) {
-            super(data, guardX, guardY, guardDirection);
-            visited = new int[data.width][data.height];
-        }
-
-        @Override
-        protected void onEachStep() {
-            markCurrentPos();
-        }
-
-        @Override
-        protected void onRotate(int obstacleX, int obstacleY) {
-            markCurrentPos();
+            // not in a loop
+            return false;
         }
 
         private void markCurrentPos() {
-            visited[guardX][guardY] |= guardDirection.mask;
+            visits[guardX][guardY] |= guardDirection.mask;
         }
     }
 
-    private static final class Part2OuterGuardMovement extends Part2GuardMovement {
+    private static final class Part2OuterGuardMovement extends GuardMovement {
         private final boolean[][] newObstacles;
         int possibleObstacles = 0;
 
         Part2OuterGuardMovement(Data data) {
-            super(data, data.guardStartX, data.guardStartY, START_DIRECTION);
+            super(data);
             newObstacles = new boolean[data.width][data.height];
-        }
-
-        @Override
-        protected boolean shouldContinue() {
-            return true;
         }
 
         @Override
@@ -164,9 +124,10 @@ public final class Day6 {
                 && !newObstacles[frontX][frontY]
                 && !(frontX == data.guardStartX && frontY == data.guardStartY)) {
                 // Let's add the obstacle and then move forward to see if we encounter a possible loop.
-                var submovement = new Part2LoopDetectorGuardMovement(data, guardX, guardY, guardDirection, frontX, frontY);
-                submovement.simulate();
-                if (submovement.foundLoop) {
+                var subdata = data.copy();
+                subdata.obstacles[frontX][frontY] = true;
+                var submovement = new GuardMovement(subdata, guardX, guardY, guardDirection);
+                if (submovement.simulate()) {
                     newObstacles[frontX][frontY] = true;
                     possibleObstacles++;
                 }
@@ -174,89 +135,14 @@ public final class Day6 {
         }
     }
 
-    private static final class Part2LoopDetectorGuardMovement extends Part2GuardMovement {
-        private final int newObstacleX;
-        private final int newObstacleY;
-        boolean foundLoop = false;
-
-        // debugging fields
-        // private static boolean printedMap = false;
-        // private final int startX, startY;
-        // private final Direction startDirection;
-
-        Part2LoopDetectorGuardMovement(Data data, int guardX, int guardY, Direction guardDirection, int newObstacleX, int newObstacleY) {
-            super(data, guardX, guardY, guardDirection);
-            this.newObstacleX = newObstacleX;
-            this.newObstacleY = newObstacleY;
-
-            // startX = guardX;
-            // startY = guardY;
-            // startDirection = guardDirection;
-        }
-
-        @Override
-        protected boolean hasObstacleAt(int x, int y) {
-            return super.hasObstacleAt(x, y) || (x == newObstacleX && y == newObstacleY);
-        }
-
-        @Override
-        protected boolean shouldContinue() {
-            return !foundLoop;
-        }
-
-        @Override
-        protected void onEachStep() {
-            // If we've visited this square before with this rotation, we're in a loop.
-            if ((visited[guardX][guardY] & guardDirection.mask) != 0) {
-                foundLoop = true;
-
-                // if (!printedMap) {
-                //     printedMap = true;
-                //     boolean[][] newObstacles = new boolean[data.width][data.height];
-                //     newObstacles[newObstacleX][newObstacleY] = true;
-                //     printMap(data, visited, newObstacles, startX, startY, startDirection, guardX, guardY);
-                // }
-            }
-
-            super.onEachStep();
-        }
-    }
-
-    private static void printMap(Data data, int[][] visited, boolean[][] newObstacles) {
-        printMap(data, visited, newObstacles, data.guardStartX, data.guardStartY, START_DIRECTION, -1, -1);
-    }
-
-    private static void printMap(Data data, int[][] visited, boolean[][] newObstacles, int startX, int startY, Direction startDirection, int loopX, int loopY) {
-        System.out.printf("loop at %d, %d%n", loopX, loopY);
-        for (int y = 0; y < data.height; y++) {
-            for (int x = 0; x < data.width; x++) {
-                if (x == loopX && y == loopY) {
-                    System.out.print('L');
-                } else if (startX == x && startY == y) {
-                    System.out.print(startDirection.symbol());
-                } else if (data.obstacles[x][y]) {
-                    System.out.print('#');
-                } else if (newObstacles != null && newObstacles[x][y]) {
-                    System.out.print('O');
-                } else {
-                    boolean visitedLr = visited != null && (visited[x][y] & (Direction.LEFT.mask | Direction.RIGHT.mask)) != 0;
-                    boolean visitedUd = visited != null && (visited[x][y] & (Direction.UP.mask | Direction.DOWN.mask)) != 0;
-
-                    if (visitedLr) {
-                        System.out.print(visitedUd ? '+' : '-');
-                    } else if (visitedUd) {
-                        System.out.print('|');
-                    } else {
-                        System.out.print('.');
-                    }
-                }
-            }
-
-            System.out.println();
-        }
-    }
-
     private record Data(int width, int height, boolean[][] obstacles, int guardStartX, int guardStartY) {
+        Data copy() {
+            boolean[][] newObstacles = new boolean[width][];
+            for (int x = 0; x < width; x++) {
+                newObstacles[x] = obstacles[x].clone();
+            }
+            return new Data(width, height, newObstacles, guardStartX, guardStartY);
+        }
     }
 
     private enum Direction {
