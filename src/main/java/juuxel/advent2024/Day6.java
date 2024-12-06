@@ -119,17 +119,13 @@ public final class Day6 {
         protected void onEachStep() {
             super.onEachStep();
 
-            int frontX = guardX + guardDirection.offsetX;
-            int frontY = guardY + guardDirection.offsetY;
-            if (isWithinBounds(frontX, frontY, data.width, data.height) && !hasObstacleAt(frontX, frontY)
-                && !newObstacles[frontX][frontY]
-                && !(frontX == data.guardStartX && frontY == data.guardStartY)) {
+            if (!newObstacles[guardX][guardY] && !(guardX == data.guardStartX && guardY == data.guardStartY)) {
                 // Let's add the obstacle and then move *from the start* to see if we encounter a possible loop.
                 var subdata = data.copy();
-                subdata.obstacles[frontX][frontY] = true;
+                subdata.obstacles[guardX][guardY] = true;
                 var submovement = new GuardMovement(subdata);
                 if (submovement.simulate()) {
-                    newObstacles[frontX][frontY] = true;
+                    newObstacles[guardX][guardY] = true;
                     possibleObstacles++;
                 }
             }
