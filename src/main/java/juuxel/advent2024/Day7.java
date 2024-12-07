@@ -92,14 +92,6 @@ public final class Day7 {
         System.out.println(part2);
     }
 
-    private static long concat(long a, long b) {
-        long size = 1;
-        while (b > size) {
-            size *= 10;
-        }
-        return a * size + b;
-    }
-
     private static BigInteger concat(BigInteger a, BigInteger b) {
         return new BigInteger(a.toString() + b.toString());
     }
