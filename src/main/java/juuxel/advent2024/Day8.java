@@ -22,11 +22,17 @@ public final class Day8 {
 
     public static void part2(Stream<String> lines) {
         partN(lines, (grid, antennaA, antennaB, diff, sink) -> {
+            // Note: never happens in my puzzle input - but I want the solution to be input-proof.
+            int gcd = Mth.gcd(diff.x, diff.y);
+            if (gcd != 1) {
+                diff = new Vec2i(diff.x / gcd, diff.y / gcd);
+            }
+
             for (Vec2i current = antennaA; current.isIn(grid); current = current.minus(diff)) {
                 sink.accept(current);
             }
 
-            for (Vec2i current = antennaB; current.isIn(grid); current = current.plus(diff)) {
+            for (Vec2i current = antennaA; current.isIn(grid); current = current.plus(diff)) {
                 sink.accept(current);
             }
         });
