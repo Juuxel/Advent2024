@@ -19,6 +19,16 @@ public final class Mth {
         return (long) Math.floor(x) + 1;
     }
 
+    public static int gcd(int a, int b) {
+        while (b != 0) {
+            int newA = b;
+            b = a % b;
+            a = newA;
+        }
+
+        return Math.abs(a);
+    }
+
     public static long gcd(long a, long b) {
         while (b != 0) {
             long newA = b;
@@ -26,7 +36,7 @@ public final class Mth {
             a = newA;
         }
 
-        return a;
+        return Math.abs(a);
     }
 
     public static long lcm(long a, long b) {
