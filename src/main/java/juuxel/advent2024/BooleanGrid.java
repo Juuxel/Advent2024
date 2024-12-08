@@ -17,4 +17,8 @@ public final class BooleanGrid extends ArrayGrid<Boolean> {
         set(x, y, true);
         return !old;
     }
+
+    public String prettyPrint() {
+        return prettyPrint(x -> x ? "#" : ".");
+    }
 }
