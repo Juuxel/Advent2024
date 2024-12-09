@@ -1,6 +1,8 @@
 package juuxel.advent2024;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public final class Day9 {
@@ -68,52 +70,81 @@ public final class Day9 {
 
     public static void part2(Stream<String> lines) {
         String line = lines.toList().getFirst();
-        int[] nums = new int[line.length()];
+        int totalFiles = 0;
+        List<Node> nodes = new ArrayList<>(line.length());
 
-        for (int i = 0; i < nums.length; i++) {
-            nums[i] = line.charAt(i) - '0';
+        for (int i = 0; i < line.length(); i++) {
+            int length = line.charAt(i) - '0';
+            var node = i % 2 == 0 ? Node.file(length, totalFiles++) : Node.gap(length);
+            nodes.add(node);
         }
 
-        int totalFiles = (nums.length + 1) / 2;
-        int[] fileStarts = new int[totalFiles];
-        int[] fileLengths = new int[totalFiles];
-        int[] gapStarts = new int[nums.length - totalFiles];
-        int[] gapLength = new int[nums.length - totalFiles];
+        int filePos = nodes.size();
+        for (int fileId = totalFiles - 1; fileId >= 0; fileId--) {
+            // Backtrack to the matching file node.
+            while (nodes.get(--filePos).fileId() != fileId);
+            Node file = nodes.get(filePos);
 
-        for (int i = 0, j = 0, fileIndex = 0, gapIndex = 0; i < nums.length; i++) {
-            boolean gap = i % 2 != 0;
-            int current = nums[i];
-            if (gap) {
-                gapStarts[gapIndex] = j;
-                gapLength[gapIndex++] = current;
-            } else {
-                fileStarts[fileIndex] = j;
-                fileLengths[fileIndex++] = current;
-            }
-            j += current;
-        }
+            for (int i = 0; i < filePos; i++) {
+                Node other = nodes.get(i);
 
-        for (int file = totalFiles - 1; file >= 0; file--) {
-            int fileStart = fileStarts[file];
-            int length = fileLengths[file];
-
-            for (int gap = 0; gap < gapStarts.length; gap++) {
-                if (gapLength[gap] < length) continue;
-                if (gapStarts[gap] + gapLength[gap] >= fileStart) break;
-
-                fileStarts[file] = gapStarts[gap];
-                gapLength[gap] -= length;
-                gapStarts[gap] += length;
-                break;
+                if (other.isGap() && other.length() >= file.length()) {
+                    nodes.remove(filePos);
+                    nodes.add(filePos, Node.gap(file.length()));
+                    nodes.add(i, file);
+                    other.resize(other.length() - file.length());
+                    break;
+                }
             }
         }
 
         long part2 = 0;
-        for (int file = 0; file < totalFiles; file++) {
-            for (int j = 0; j < fileLengths[file]; j++) {
-                part2 += (long) file * (long) (j + fileStarts[file]);
+        int position = 0;
+        for (Node node : nodes) {
+            if (!node.isGap()) {
+                for (int i = 0; i < node.length(); i++) {
+                    part2 += (long) (i + position) * (long) node.fileId();
+                }
             }
+
+            position += node.length();
         }
         System.out.println(part2);
+    }
+
+    private static final class Node {
+        private int length;
+        private final int fileId;
+        private final boolean gap;
+
+        private Node(int length, int fileId, boolean gap) {
+            this.length = length;
+            this.fileId = fileId;
+            this.gap = gap;
+        }
+
+        static Node file(int length, int fileId) {
+            return new Node(length, fileId, false);
+        }
+
+        static Node gap(int length) {
+            return new Node(length, -1, true);
+        }
+
+        public int fileId() {
+            return fileId;
+        }
+
+        public boolean isGap() {
+            return gap;
+        }
+
+        public int length() {
+            return length;
+        }
+
+        public void resize(int length) {
+            this.length = length;
+        }
     }
 }
