@@ -2,5 +2,6 @@
 .idea/
 .vscode/
 build/
+/out/
 
 day*.txt
