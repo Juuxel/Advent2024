@@ -1,6 +1,7 @@
 package juuxel.advent2024;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ArrayGrid<T> implements Grid<T> {
     private final Object[][] grid;
@@ -45,5 +46,11 @@ public class ArrayGrid<T> implements Grid<T> {
 
     public void set(int x, int y, T t) {
         grid[x][y] = t;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<T> columnAt(int x) {
+        return (List<T>) Arrays.asList(grid[x]);
     }
 }

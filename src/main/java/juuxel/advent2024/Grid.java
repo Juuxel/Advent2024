@@ -1,11 +1,45 @@
 package juuxel.advent2024;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public interface Grid<T> {
     int width();
     int height();
     T get(int x, int y);
+
+    default List<T> columnAt(int x) {
+        List<T> column = new ArrayList<>(height());
+        for (int y = 0; y < height(); y++) {
+            column.add(get(x, y));
+        }
+        return column;
+    }
+
+    default List<T> rowAt(int y) {
+        List<T> row = new ArrayList<>(width());
+        for (int x = 0; x < width(); x++) {
+            row.add(get(x, y));
+        }
+        return row;
+    }
+
+    default List<List<T>> columns() {
+        List<List<T>> result = new ArrayList<>(width());
+        for (int x = 0; x < width(); x++) {
+            result.add(columnAt(x));
+        }
+        return result;
+    }
+
+    default List<List<T>> rows() {
+        List<List<T>> result = new ArrayList<>(height());
+        for (int y = 0; y < height(); y++) {
+            result.add(rowAt(y));
+        }
+        return result;
+    }
 
     default <U> Grid<U> map(Function<T, U> transform) {
         ArrayGrid<U> mapped = new ArrayGrid<>(width(), height());
