@@ -1,8 +1,7 @@
 open System.Collections.Generic
 open System.Numerics
 
-let numberOfDigits (num: BigInteger) =
-    1 + (BigInteger.Log10 num |> int)
+let numberOfDigits (num: BigInteger) = 1 + int (BigInteger.Log10 num)
 
 let rec blink (cache: Dictionary<int * BigInteger, int64>) depth num =
     let cacheKey = (depth, num)
