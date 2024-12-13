@@ -1,11 +1,31 @@
 package juuxel.advent2024;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 
 public final class Iterables {
+    public static <T> List<List<T>> split(Iterable<T> ts, T separator) {
+        List<List<T>> result = new ArrayList<>();
+        List<T> buffer = new ArrayList<>();
+
+        for (T t : ts) {
+            if (Objects.equals(separator, t)) {
+                result.add(List.copyOf(buffer));
+                buffer.clear();
+            } else {
+                buffer.add(t);
+            }
+        }
+
+        result.add(List.copyOf(buffer));
+        return result;
+    }
+
     public static <A> IterableX<A> x(Iterable<A> source) {
         return source instanceof IterableX<A> x ? x : source::iterator;
     }
