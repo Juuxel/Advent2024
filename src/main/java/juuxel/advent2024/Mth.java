@@ -42,4 +42,10 @@ public final class Mth {
     public static long lcm(long a, long b) {
         return a * (b / gcd(a, b));
     }
+
+    public static int mod(int a, int b) {
+        int result = a % b;
+        if (result < 0) return result + b;
+        return result;
+    }
 }
