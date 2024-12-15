@@ -28,6 +28,20 @@ public class ArrayGrid<T> implements Grid<T> {
         }
     }
 
+    public ArrayGrid(Grid<T> other) {
+        this(other.width(), other.height());
+
+        if (other instanceof ArrayGrid<T> arrayGrid) {
+            for (int x = 0; x < width; x++) {
+                grid[x] = arrayGrid.grid[x].clone();
+            }
+        } else {
+            for (int x = 0; x < width; x++) {
+                grid[x] = other.columnAt(x).toArray();
+            }
+        }
+    }
+
     @Override
     public int width() {
         return width;
