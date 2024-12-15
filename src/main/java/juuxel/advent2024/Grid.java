@@ -1,5 +1,6 @@
 package juuxel.advent2024;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -10,19 +11,31 @@ public interface Grid<T> {
     T get(int x, int y);
 
     default List<T> columnAt(int x) {
-        List<T> column = new ArrayList<>(height());
-        for (int y = 0; y < height(); y++) {
-            column.add(get(x, y));
-        }
-        return column;
+        return new AbstractList<>() {
+            @Override
+            public T get(int index) {
+                return Grid.this.get(x, index);
+            }
+
+            @Override
+            public int size() {
+                return Grid.this.height();
+            }
+        };
     }
 
     default List<T> rowAt(int y) {
-        List<T> row = new ArrayList<>(width());
-        for (int x = 0; x < width(); x++) {
-            row.add(get(x, y));
-        }
-        return row;
+        return new AbstractList<>() {
+            @Override
+            public T get(int index) {
+                return Grid.this.get(index, y);
+            }
+
+            @Override
+            public int size() {
+                return Grid.this.width();
+            }
+        };
     }
 
     default List<List<T>> columns() {
