@@ -3,14 +3,10 @@ package juuxel.advent2024;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.stream.Stream;
 
 public final class Day16 {
@@ -38,15 +34,11 @@ public final class Day16 {
             }
         }
 
-        // Part 1
-        int minScore = aStar(grid, new Point(startX, startY), new Point(endX, endY));
-        System.out.println(minScore);
-
-        // Part 2
-        List<List<Point>> paths = findAllPathsWithScore(grid, new Point(startX, startY), new Point(endX, endY), minScore);
+        var result = aStar(grid, new Point(startX, startY), new Point(endX, endY));
+        System.out.println(result.bestScore);
 
         BooleanGrid visited = new BooleanGrid(grid.width(), grid.height());
-        for (var path : paths) {
+        for (var path : result.paths) {
             for (Point point : path) {
                 visited.mark(point.x, point.y);
             }
@@ -71,58 +63,7 @@ public final class Day16 {
         return result;
     }
 
-    private static int aStar(CharGrid grid, Point start, Point end) {
-        record Pwd(Point point, Direction direction) {
-        }
-        record Neighbour(Point point, Direction direction, int score) {
-        }
-
-        Multimap<Integer, Pwd> openSet = MultimapBuilder.treeKeys().hashSetValues().build();
-        openSet.put(0, new Pwd(start, Direction.EAST));
-        Map<Point, Integer> pathScores = new HashMap<>(); // min score to get to key from start
-        pathScores.put(start, 0);
-
-        while (!openSet.isEmpty()) {
-            var iter = openSet.values().iterator();
-            var currentPwd = iter.next();
-            var current = currentPwd.point;
-            var direction = currentPwd.direction;
-            iter.remove();
-
-            if (grid.getChar(current.x, current.y) == '#') {
-                // We can't move here
-                continue;
-            }
-
-            int score = pathScores.get(current);
-
-            if (current.equals(end)) {
-                return score;
-            }
-
-            var cw = direction.turnClockwise();
-            var ccw = direction.turnCounterclockwise();
-            Neighbour[] neighbours = {
-                new Neighbour(new Point(current.x + direction.x, current.y + direction.y), direction, score + 1),
-                new Neighbour(new Point(current.x + cw.x, current.y + cw.y), cw, score + 1001),
-                new Neighbour(new Point(current.x + ccw.x, current.y + ccw.y), ccw, score + 1001),
-            };
-
-            for (Neighbour neighbour : neighbours) {
-                if (neighbour.score < pathScores.getOrDefault(neighbour.point, Integer.MAX_VALUE)) {
-                    pathScores.put(neighbour.point, neighbour.score);
-                    var pwd = new Pwd(neighbour.point, neighbour.direction);
-                    if (!openSet.containsValue(pwd)) {
-                        openSet.put(neighbour.score + 1000 + Math.abs(neighbour.point.x - end.x) + Math.abs(neighbour.point.y - end.y), pwd);
-                    }
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    private static List<List<Point>> findAllPathsWithScore(CharGrid grid, Point start, Point end, int targetScore) {
+    private static PathFindResult aStar(CharGrid grid, Point start, Point end) {
         record Movement(Point point, Direction direction, int score, List<Point> path) {
         }
         record Pwd(Point point, Direction direction) {
@@ -135,6 +76,7 @@ public final class Day16 {
         Map<Pwd, Integer> pathScores = new HashMap<>(); // min score to get to key from start
         pathScores.put(new Pwd(start, Direction.EAST), 0);
 
+        int targetScore = -1;
         List<List<Point>> allPaths = new ArrayList<>();
 
         while (!openSet.isEmpty()) {
@@ -150,9 +92,10 @@ public final class Day16 {
             }
 
             int score = movement.score;
-            if (score > targetScore) continue;
+            if (targetScore >= 0 && score > targetScore) continue;
 
             if (current.equals(end)) {
+                targetScore = score;
                 allPaths.add(movement.path);
                 continue;
             }
@@ -177,10 +120,13 @@ public final class Day16 {
             }
         }
 
-        return allPaths;
+        return new PathFindResult(allPaths, targetScore);
     }
 
     private record Point(int x, int y) {
+    }
+
+    private record PathFindResult(List<List<Point>> paths, int bestScore) {
     }
 
     private enum Direction {
