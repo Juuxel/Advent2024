@@ -9,6 +9,10 @@ public final class BooleanGrid extends ArrayGrid<Boolean> {
         super(width, height, defaultValue);
     }
 
+    public BooleanGrid(Grid<Boolean> other) {
+        super(other);
+    }
+
     /**
      * Marks the position as true. Returns whether the state changed.
      */

@@ -60,6 +60,7 @@ public final class AdventGui {
         new Solution("Day 14, part 2 (Java)", 14, lines(lines -> Day14.part2(lines, false))),
         new Solution("Day 15 (part 1, Java)", 15, lines(Day15::part1)),
         new Solution("Day 15 (part 2, Java)", 15, lines(Day15::part2)),
+        new Solution("Day 16 (Java)", 16, lines(Day16::run)),
     };
 
     public static void main(String[] args) {
