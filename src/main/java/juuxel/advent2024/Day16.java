@@ -37,17 +37,11 @@ public final class Day16 {
         var result = aStar(grid, new Point(startX, startY), new Point(endX, endY));
         System.out.println(result.bestScore);
 
+        int marked = 0;
         BooleanGrid visited = new BooleanGrid(grid.width(), grid.height());
         for (var path : result.paths) {
             for (Point point : path) {
-                visited.mark(point.x, point.y);
-            }
-        }
-
-        int marked = 0;
-        for (int x = 0; x < grid.width(); x++) {
-            for (int y = 0; y < grid.height(); y++) {
-                if (visited.get(x, y)) {
+                if (visited.mark(point.x, point.y)) {
                     marked++;
                 }
             }
