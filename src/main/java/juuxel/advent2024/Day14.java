@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public final class Day14 {
-    private static final int GRID_WIDTH = 101;
-    private static final int GRID_HEIGHT = 103;
+    static final int GRID_WIDTH = 101;
+    static final int GRID_HEIGHT = 103;
     private static final int TIME = 100;
     private static final Pattern ROBOT_PATTERN = Pattern.compile("^p=(-?[0-9]+),(-?[0-9]+) v=(-?[0-9]+),(-?[0-9]+)$");
 
@@ -136,7 +136,7 @@ public final class Day14 {
         });
     }
 
-    private static Robot readRobot(String line) {
+    static Robot readRobot(String line) {
         var matcher = ROBOT_PATTERN.matcher(line);
         if (matcher.matches()) {
             int px = Integer.parseInt(matcher.group(1));
@@ -157,7 +157,7 @@ public final class Day14 {
         }
     }
 
-    private record Vector(int x, int y) {
+    record Vector(int x, int y) {
         int quadrant() {
             int midX = GRID_WIDTH / 2;
             int midY = GRID_HEIGHT / 2;
@@ -175,7 +175,7 @@ public final class Day14 {
         }
     }
 
-    private record Robot(Vector startPos, Vector velocity) {
+    record Robot(Vector startPos, Vector velocity) {
         Vector simulate(int time) {
             return new Vector(
                 Mth.mod(startPos.x + time * velocity.x, GRID_WIDTH),
