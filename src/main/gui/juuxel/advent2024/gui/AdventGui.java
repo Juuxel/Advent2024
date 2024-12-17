@@ -18,6 +18,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.IntConsumer;
@@ -62,6 +63,7 @@ public final class AdventGui {
         new Solution("Day 15, part 1", 15, lines(Day15::part1)),
         new Solution("Day 15, part 2", 15, lines(Day15::part2)),
         new Solution("Day 16", 16, lines(Day16::run)),
+        new Solution("Day 17, part 1", 17, linesToList(Day17::part1)),
     };
 
     public static void main(String[] args) {
@@ -231,12 +233,21 @@ public final class AdventGui {
         void run(String[] args) throws Exception;
     }
 
+    @FunctionalInterface
+    private interface ThrowingMainWithLineList {
+        void run(List<String> args) throws Exception;
+    }
+
     private static ThrowingMain linesToArgs(ThrowingMainWithArgs main) {
         return data -> main.run(data.lines().toArray(String[]::new));
     }
 
     private static ThrowingMain lines(ThrowingMainWithLineStream main) {
         return data -> main.run(data.lines());
+    }
+
+    private static ThrowingMain linesToList(ThrowingMainWithLineList main) {
+        return data -> main.run(data.lines().toList());
     }
 
     private static final class TextAreaWriter extends Writer {
