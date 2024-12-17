@@ -4,4 +4,6 @@
 build/
 /out/
 
+# Private files
 day*.txt
+*Private.java
