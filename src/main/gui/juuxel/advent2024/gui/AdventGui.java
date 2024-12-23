@@ -66,6 +66,7 @@ public final class AdventGui {
         new Solution("Day 17, part 1", 17, linesToList(Day17::part1)),
         new Solution("Day 18, part 1", 18, lines(Day18::part1)),
         new Solution("Day 18, part 2", 18, lines(Day18::part2)),
+        new Solution("Day 23, part 1", 23, linesToList(Day23::part1)),
     };
 
     public static void main(String[] args) {
