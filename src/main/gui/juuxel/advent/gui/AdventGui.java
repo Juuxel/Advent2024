@@ -38,7 +38,10 @@ public final class AdventGui {
     }
 
     private static List<Year> getYears() {
-        return List.of(Advent2024Solutions.YEAR);
+        return List.of(
+            Advent2025Solutions.YEAR,
+            Advent2024Solutions.YEAR
+        );
     }
 
     public static void main(String[] args) {
