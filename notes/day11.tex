@@ -1,0 +1,53 @@
+\documentclass[a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\renewcommand{\geq}{\geqslant}
+
+\title{Advent of Code 2024 -- day 11 notes}
+\date{11 December 2024}
+\author{}
+
+\begin{document}
+\maketitle
+
+We can optimise the algorithm by replacing a ``raw'' number \(n\) with the representation
+\(n = r \cdot 2024^k\), where \(r\) is a nonnegative long, \(\gcd(r, 2024) = 1\) and \(k\) is a nonnegative int.
+
+The number of digits of \(n\), denoted as \(D(n)\), can also be computed using
+just \(r\) and \(k\) without having to compute
+the actual value of \(n\):
+\[
+    D(r \cdot 2024^k) = \lfloor k \log_{10} 2024 + \log_{10} r \rfloor + 1.
+\]
+
+The rules then turn to this:
+\begin{enumerate}
+    \item If \(r = 0\), yield \((r', k') = (1, 0)\).
+    \item If \(D(n)\) is even, we have to compute the product to split \(n\)
+    into the two halves. We'll denote them as \(L\) and \(R\).
+    \begin{enumerate}
+        \item \(L = \Bigl\lfloor \frac{n}{10^{D(n)/2}} \Bigr\rfloor\)
+        \item \(R = n - L \cdot 10^{D(n)/2}\)
+        \item Yield the \((r, k)\)-representations of \(L\) and \(R\).
+    \end{enumerate}
+    \item Otherwise, yield \((r', k') = (r, k + 1)\).
+\end{enumerate}
+
+In particular, we want to simplify step 2. We can replace
+\(H = r\cdot 2024^k\), one of the halves, with a smaller number \(H' = r' \cdot 2024^{k'}\) that needs to
+satisfy the following:
+\begin{enumerate}
+    \item \(r' = 0\) if and only if \(r = 0\)
+    \item The number of digits of \(H' \cdot 2024^\ell\) is even
+    if and only if \(D(H \cdot 2024^\ell)\) is even for all \(\ell \geq 0\).
+    Written as a congruence,
+    \[\begin{split}
+        D(H \cdot 2024^\ell) &\equiv D(H' \cdot 2024^\ell)\mod{2} \\
+        \Leftrightarrow D(r \cdot 2024^{k + \ell}) &\equiv D(r' \cdot 2024^{k' + \ell})\mod{2} \\
+        \Leftrightarrow \lfloor (k + \ell) \log_{10} 2024 + \log_{10} r \rfloor &\equiv \lfloor (k' + \ell) \log_{10} 2024 + \log_{10} r' \rfloor\mod{2}. \\
+    \end{split}\]
+\end{enumerate}
+
+\end{document}
