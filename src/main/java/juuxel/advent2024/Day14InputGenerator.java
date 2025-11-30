@@ -1,5 +1,7 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Mth;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

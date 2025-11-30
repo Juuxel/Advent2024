@@ -1,11 +1,13 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public final class Day14Part2Statistical {
     public static void main(String[] args) throws Exception {
-        part2(Loader.lines(14));
+        part2(Loader.lines(2024, 14));
     }
 
     public static void part2(Stream<String> lines) {

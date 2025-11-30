@@ -1,12 +1,14 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+
 import java.util.stream.Stream;
 
 public final class Day6 {
     private static final Direction START_DIRECTION = Direction.UP;
 
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(6));
+        run(Loader.lines(2024, 6));
     }
 
     public static void run(Stream<String> lines) {

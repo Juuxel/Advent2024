@@ -1,4 +1,4 @@
-package juuxel.advent2024;
+package juuxel.advent;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

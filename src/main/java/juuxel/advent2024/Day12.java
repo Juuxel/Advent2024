@@ -1,5 +1,9 @@
 package juuxel.advent2024;
 
+import juuxel.advent.BooleanGrid;
+import juuxel.advent.CharGrid;
+import juuxel.advent.Loader;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +12,7 @@ import java.util.stream.Stream;
 
 public final class Day12 {
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(12));
+        run(Loader.lines(2024, 12));
     }
 
     public static void run(Stream<String> lines) {

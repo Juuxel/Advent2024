@@ -1,5 +1,8 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+import juuxel.advent.Mth;
+
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -31,8 +34,8 @@ public final class Day14 {
     private static final Pattern ROBOT_PATTERN = Pattern.compile("^p=(-?[0-9]+),(-?[0-9]+) v=(-?[0-9]+),(-?[0-9]+)$");
 
     public static void main(String[] args) throws Exception {
-        part1(Loader.lines(14));
-        part2(Loader.lines(14), true);
+        part1(Loader.lines(2024, 14));
+        part2(Loader.lines(2024, 14), true);
     }
 
     public static void part1(Stream<String> lines) {

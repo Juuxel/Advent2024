@@ -2,6 +2,9 @@ package juuxel.advent2024;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import juuxel.advent.BooleanGrid;
+import juuxel.advent.CharGrid;
+import juuxel.advent.Loader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +14,7 @@ import java.util.stream.Stream;
 
 public final class Day16 {
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(16));
+        run(Loader.lines(2024, 16));
     }
 
     public static void run(Stream<String> lines) {

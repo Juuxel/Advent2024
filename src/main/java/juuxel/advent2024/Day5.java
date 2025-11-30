@@ -1,5 +1,7 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -8,8 +10,8 @@ import java.util.stream.Stream;
 
 public final class Day5 {
     public static void main(String[] args) throws Exception {
-        part1(Loader.lines(5));
-        part2(Loader.lines(5));
+        part1(Loader.lines(2024, 5));
+        part2(Loader.lines(2024, 5));
     }
 
     public static void part1(Stream<String> lines) {

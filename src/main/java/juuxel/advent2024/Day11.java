@@ -1,5 +1,7 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,7 +12,7 @@ public final class Day11 {
     private static final BigInteger BIGINT_2024 = BigInteger.valueOf(2024);
 
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(11));
+        run(Loader.lines(2024, 11));
     }
 
     public static void run(Stream<String> lines) {

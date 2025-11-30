@@ -1,5 +1,9 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Iterables;
+import juuxel.advent.Loader;
+import juuxel.advent.Mth;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -12,7 +16,7 @@ public final class Day13 {
     private static final long PART_2_OFFSET = 10_000_000_000_000L;
 
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(13));
+        run(Loader.lines(2024, 13));
     }
 
     public static void run(Stream<String> lines) {

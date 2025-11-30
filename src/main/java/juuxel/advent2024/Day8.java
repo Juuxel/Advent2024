@@ -1,5 +1,10 @@
 package juuxel.advent2024;
 
+import juuxel.advent.CharGrid;
+import juuxel.advent.Grid;
+import juuxel.advent.Loader;
+import juuxel.advent.Mth;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +14,8 @@ import java.util.stream.Stream;
 
 public final class Day8 {
     public static void main(String[] args) throws Exception {
-        part1(Loader.lines(8));
-        part2(Loader.lines(8));
+        part1(Loader.lines(2024, 8));
+        part2(Loader.lines(2024, 8));
     }
 
     public static void part1(Stream<String> lines) {

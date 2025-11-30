@@ -1,4 +1,4 @@
-package juuxel.advent2024;
+package juuxel.advent;
 
 import java.util.Arrays;
 import java.util.List;

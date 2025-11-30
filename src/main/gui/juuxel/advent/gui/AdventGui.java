@@ -1,6 +1,6 @@
-package juuxel.advent2024.gui;
+package juuxel.advent.gui;
 
-import juuxel.advent2024.*;
+import juuxel.advent.Loader;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 
@@ -17,61 +17,29 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 
 public final class AdventGui {
     private static final Executor EXECUTOR = Executors.newSingleThreadExecutor(r -> new Thread(r, "Advent"));
     private static final NumberFormat TIME_FORMAT = new DecimalFormat("#######.###");
+    private static final int CURRENT_YEAR;
     private static final int CURRENT_DAY;
 
     static {
         LocalDate today = LocalDate.now();
         int currentDayUnclamped = today.getMonth() == Month.DECEMBER ? today.getDayOfMonth() : 1;
+        CURRENT_YEAR = today.getYear();
         CURRENT_DAY = Math.min(currentDayUnclamped, 25);
     }
 
-    private static final Solution[] SOLUTIONS = {
-        new Solution("Day 1, part 1", 1, lines(Day1::part1)),
-        new Solution("Day 1, part 2", 1, lines(Day1::part2)),
-        new Solution("Day 2, part 1", 2, lines(Day2::part1)),
-        new Solution("Day 2, part 2", 2, lines(Day2::part2)),
-        new Solution("Day 3, part 1", 3, lines(Day3::part1)),
-        new Solution("Day 3, part 2", 3, lines(Day3::part2)),
-        new Solution("Day 4, part 1", 4, lines(Day4::part1)),
-        new Solution("Day 4, part 2", 4, lines(Day4::part2)),
-        new Solution("Day 5, part 1", 5, lines(Day5::part1)),
-        new Solution("Day 5, part 2", 5, lines(Day5::part2)),
-        new Solution("Day 6", 6, lines(Day6::run)),
-        new Solution("Day 7, part 1", 7, lines(Day7::part1)),
-        new Solution("Day 7, part 2", 7, lines(Day7::part2)),
-        new Solution("Day 8, part 1", 8, lines(Day8::part1)),
-        new Solution("Day 8, part 2", 8, lines(Day8::part2)),
-        new Solution("Day 9, part 1", 9, lines(Day9::part1)),
-        new Solution("Day 9, part 2", 9, lines(Day9::part2)),
-        new Solution("Day 10", 10, lines(Day10::run)),
-        new Solution("Day 11", 11, lines(Day11::run)),
-        new Solution("Day 12", 12, lines(Day12::run)),
-        new Solution("Day 13", 13, lines(Day13::run)),
-        new Solution("Day 14, part 1", 14, lines(Day14::part1)),
-        new Solution("Day 14, part 2 (GUI)", 14, lines(lines -> Day14.part2(lines, false))),
-        new Solution("Day 14, part 2 (statistics)", 14, lines(Day14Part2Statistical::part2)),
-        new Solution("Day 15, part 1", 15, lines(Day15::part1)),
-        new Solution("Day 15, part 2", 15, lines(Day15::part2)),
-        new Solution("Day 16", 16, lines(Day16::run)),
-        new Solution("Day 17, part 1", 17, linesToList(Day17::part1)),
-        new Solution("Day 18, part 1", 18, lines(Day18::part1)),
-        new Solution("Day 18, part 2", 18, lines(Day18::part2)),
-        new Solution("Day 22, part 1", 22, linesToList(Day22::part1)),
-        new Solution("Day 22, part 2", 22, linesToList(Day22::part1)),
-        new Solution("Day 23, part 1", 23, linesToList(Day23::part1)),
-        new Solution("Day 24, part 1", 24, linesToList(Day24::part1)),
-        new Solution("Day 25, part 1", 25, linesToList(Day25::part1)),
-    };
+    private static List<Year> getYears() {
+        return List.of(Advent2024Solutions.YEAR);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -82,7 +50,28 @@ public final class AdventGui {
             }
 
             JPanel panel = new JPanel(new BorderLayout());
-            JList<Solution> solutions = new JList<>(SOLUTIONS);
+
+            List<Year> years = getYears();
+            JTabbedPane tabs = new JTabbedPane();
+            List<JList<Solution>> solutionLists = new ArrayList<>();
+
+            for (var year : years) {
+                JList<Solution> solutions = new JList<>(year.solutions.toArray(new Solution[0]));
+                solutionLists.add(solutions);
+                solutions.setSelectedIndex(0);
+
+                if (year.number == CURRENT_YEAR) {
+                    for (Solution solution : year.solutions) {
+                        if (solution.day() == CURRENT_DAY) {
+                            solutions.setSelectedValue(solution, true);
+                            break;
+                        }
+                    }
+                }
+
+                tabs.add(String.valueOf(year.number), new JScrollPane(solutions));
+            }
+
             JButton run = new JButton("Run");
             JButton load = new JButton("Load input");
             JButton loadToday = new JButton("Today's input");
@@ -92,13 +81,18 @@ public final class AdventGui {
             JPanel inputButtons = new JPanel(new GridLayout(1, 0));
             JScrollPane inputScroll = new JScrollPane(input);
             JScrollPane outputScroll = new JScrollPane(output);
-            JSplitPane sideSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(solutions), inputArea);
+            JSplitPane sideSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabs, inputArea);
             JSplitPane mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sideSplit, outputScroll);
-            JFrame frame = new JFrame("Advent of Code 2024");
+            JFrame frame = new JFrame("Advent of Code");
 
-            IntConsumer setData = day -> {
+            @FunctionalInterface
+            interface DataConsumer {
+                void accept(int year, int day);
+            }
+
+            DataConsumer setData = (year, day) -> {
                 try {
-                    InputStream in = Loader.stream(day);
+                    InputStream in = Loader.stream(year, day);
 
                     if (in == null) {
                         JOptionPane.showMessageDialog(load, "It's not " + day + " December yet!", "Could not find data", JOptionPane.ERROR_MESSAGE);
@@ -113,14 +107,6 @@ public final class AdventGui {
                 }
             };
 
-            solutions.setSelectedIndex(0);
-            for (Solution solution : SOLUTIONS) {
-                if (solution.day() == CURRENT_DAY) {
-                    solutions.setSelectedValue(solution, true);
-                    break;
-                }
-            }
-
             output.setEditable(false);
             sideSplit.setDividerLocation(0.5);
 
@@ -132,7 +118,8 @@ public final class AdventGui {
             outputScroll.setBorder(BorderFactory.createTitledBorder("Output"));
 
             run.addActionListener(e -> {
-                EXECUTOR.execute(timed(input.getText(), solutions.getSelectedValue()));
+                var solution = solutionLists.get(tabs.getSelectedIndex()).getSelectedValue();
+                EXECUTOR.execute(timed(input.getText(), solution));
             });
 
             load.addActionListener(e -> {
@@ -166,10 +153,14 @@ public final class AdventGui {
 
                 if (!accepted[0]) return;
                 int day = slider.getValue();
-                setData.accept(day);
+                setData.accept(CURRENT_YEAR, day); // add year option
             });
 
-            loadToday.addActionListener(e -> setData.accept(solutions.getSelectedValue().day()));
+            loadToday.addActionListener(e -> {
+                Year year = years.get(tabs.getSelectedIndex());
+                Solution solution = solutionLists.get(tabs.getSelectedIndex()).getSelectedValue();
+                setData.accept(year.number, solution.day());
+            });
 
             Writer outputWriter = new TextAreaWriter(output);
             System.setOut(new PrintStream(attachWriter(System.out, outputWriter)));
@@ -218,7 +209,13 @@ public final class AdventGui {
         };
     }
 
-    private record Solution(String name, int day, ThrowingMain task) {
+    public record Year(int number, List<Solution> solutions) {
+        public Year(int number, Solution... solutions) {
+            this(number, List.of(solutions));
+        }
+    }
+
+    public record Solution(String name, int day, ThrowingMain task) {
         @Override
         public String toString() {
             return name;
@@ -226,34 +223,34 @@ public final class AdventGui {
     }
 
     @FunctionalInterface
-    private interface ThrowingMain {
+    public interface ThrowingMain {
         void run(String data) throws Exception;
     }
 
     @FunctionalInterface
-    private interface ThrowingMainWithLineStream {
+    public interface ThrowingMainWithLineStream {
         void run(Stream<String> lines) throws Exception;
     }
 
     @FunctionalInterface
-    private interface ThrowingMainWithArgs {
+    public interface ThrowingMainWithArgs {
         void run(String[] args) throws Exception;
     }
 
     @FunctionalInterface
-    private interface ThrowingMainWithLineList {
+    public interface ThrowingMainWithLineList {
         void run(List<String> args) throws Exception;
     }
 
-    private static ThrowingMain linesToArgs(ThrowingMainWithArgs main) {
+    public static ThrowingMain linesToArgs(ThrowingMainWithArgs main) {
         return data -> main.run(data.lines().toArray(String[]::new));
     }
 
-    private static ThrowingMain lines(ThrowingMainWithLineStream main) {
+    public static ThrowingMain lines(ThrowingMainWithLineStream main) {
         return data -> main.run(data.lines());
     }
 
-    private static ThrowingMain linesToList(ThrowingMainWithLineList main) {
+    public static ThrowingMain linesToList(ThrowingMainWithLineList main) {
         return data -> main.run(data.lines().toList());
     }
 

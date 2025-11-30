@@ -1,17 +1,17 @@
 package juuxel.advent2024;
 
+import juuxel.advent.CharGrid;
+import juuxel.advent.Loader;
+
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public final class Day10 {
     public static void main(String[] args) throws Exception {
-        run(Loader.lines(10));
+        run(Loader.lines(2024, 10));
     }
 
     public static void run(Stream<String> lines) {

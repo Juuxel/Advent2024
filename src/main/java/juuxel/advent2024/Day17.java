@@ -1,5 +1,7 @@
 package juuxel.advent2024;
 
+import juuxel.advent.Loader;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,7 +85,7 @@ public final class Day17 {
     }
 
     public static void main(String[] args) throws Exception {
-        part1(Loader.lines(17).toList());
+        part1(Loader.lines(2024, 17).toList());
         // part2(Loader.lines(17).toList());
     }
 
