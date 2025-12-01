@@ -7,6 +7,7 @@ import static juuxel.advent.gui.AdventGui.linesToList;
 
 public final class Advent2025Solutions {
     public static final AdventGui.Solution[] SOLUTIONS = {
+        new AdventGui.Solution("Day 1", 1, linesToList(Day1::part12)),
     };
 
     public static final AdventGui.Year YEAR = new AdventGui.Year(2025, SOLUTIONS);
