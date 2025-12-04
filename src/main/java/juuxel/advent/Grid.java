@@ -54,7 +54,7 @@ public interface Grid<T> {
         return result;
     }
 
-    default <U> Grid<U> map(Function<T, U> transform) {
+    default <U> ArrayGrid<U> map(Function<T, U> transform) {
         ArrayGrid<U> mapped = new ArrayGrid<>(width(), height());
 
         for (int x = 0; x < mapped.width(); x++) {
