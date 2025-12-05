@@ -43,30 +43,26 @@ public final class Day5 {
 
     private static List<Range> splitIntoDisjoint(List<Range> ranges) {
         List<Range> input = new ArrayList<>(ranges);
+        List<Range> next = new ArrayList<>();
 
-        while (!isInReducedForm(input)) {
-            List<Range> next = new ArrayList<>();
+        for (Range range : input) {
+            Iterator<Range> iterator = next.iterator();
 
-            for (Range range : input) {
-                Iterator<Range> iterator = next.iterator();
+            while (iterator.hasNext()) {
+                Range existing = iterator.next();
 
-                while (iterator.hasNext()) {
-                    Range existing = iterator.next();
-
-                    if (existing.overlapsWith(range)) {
-                        long start = Long.min(existing.start, range.start);
-                        long end = Long.max(existing.end, range.end);
-                        iterator.remove();
-                        range = new Range(start, end);
-                    }
+                if (existing.overlapsWith(range)) {
+                    long start = Long.min(existing.start, range.start);
+                    long end = Long.max(existing.end, range.end);
+                    iterator.remove();
+                    range = new Range(start, end);
                 }
-
-                next.add(range);
             }
 
-            input = next;
+            next.add(range);
         }
 
+        assert isInReducedForm(ranges);
         return input;
     }
 
