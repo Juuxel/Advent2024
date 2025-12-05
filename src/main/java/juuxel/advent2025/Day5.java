@@ -47,22 +47,17 @@ public final class Day5 {
         while (!isInReducedForm(input)) {
             List<Range> next = new ArrayList<>();
 
-            top: for (Range range : input) {
+            for (Range range : input) {
                 Iterator<Range> iterator = next.iterator();
 
                 while (iterator.hasNext()) {
                     Range existing = iterator.next();
 
-                    if (existing.contains(range)) {
-                        continue top;
-                    } else if (range.contains(existing)) {
-                        iterator.remove();
-                    } else if (existing.overlapsWith(range)) {
+                    if (existing.overlapsWith(range)) {
                         long start = Long.min(existing.start, range.start);
                         long end = Long.max(existing.end, range.end);
                         iterator.remove();
-                        next.add(new Range(start, end));
-                        continue top;
+                        range = new Range(start, end);
                     }
                 }
 
@@ -93,10 +88,6 @@ public final class Day5 {
     private record Range(long start, long end) {
         boolean contains(long value) {
             return start <= value && value <= end;
-        }
-
-        boolean contains(Range other) {
-            return start <= other.start && other.end <= end;
         }
 
         boolean overlapsWith(Range other) {
