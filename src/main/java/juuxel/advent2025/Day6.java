@@ -61,13 +61,7 @@ public final class Day6 {
     }
 
     private static Input parseP2(List<String> lines) {
-        List<String> numberLines = lines.subList(0, lines.size() - 1);
-        int gridWidth = numberLines.stream().mapToInt(String::length).max().orElseThrow();
-        List<String> paddedNumberLines = numberLines.stream()
-            .map(line -> line + " ".repeat(gridWidth - line.length()))
-            .toList();
-
-        CharGrid inputGrid = new CharGrid(paddedNumberLines);
+        CharGrid inputGrid = CharGrid.createRightPadded(lines.subList(0, lines.size() - 1), ' ');
         List<Integer> opPositions = new ArrayList<>();
         List<Op> ops = new ArrayList<>();
 

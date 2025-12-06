@@ -19,6 +19,14 @@ public final class CharGrid implements Grid<Character> {
         this(lines.toList());
     }
 
+    public static CharGrid createRightPadded(List<String> lines, char padding) {
+        int gridWidth = lines.stream().mapToInt(String::length).max().orElseThrow();
+        List<String> paddedLines = lines.stream()
+            .map(line -> line + ("" + padding).repeat(gridWidth - line.length()))
+            .toList();
+        return new CharGrid(paddedLines);
+    }
+
     @Override
     public int width() {
         return width;
