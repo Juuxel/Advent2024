@@ -1,7 +1,7 @@
 package juuxel.advent2025;
 
-import juuxel.advent.ArrayGrid;
 import juuxel.advent.CharGrid;
+import juuxel.advent.IntGrid;
 import juuxel.advent.Loader;
 
 import java.util.stream.Stream;
@@ -14,19 +14,19 @@ public final class Day4 {
 
     public static void part1(Stream<String> lines) {
         var inputGrid = new CharGrid(lines);
-        ArrayGrid<Integer> neighborGrid = new ArrayGrid<>(inputGrid.width(), inputGrid.height(), 0);
+        IntGrid neighborGrid = new IntGrid(inputGrid.width(), inputGrid.height());
 
         for (int x = 0; x < inputGrid.width(); x++) {
             for (int y = 0; y < inputGrid.height(); y++) {
                 if (inputGrid.getChar(x, y) == '@') {
-                    incrementIfContains(neighborGrid, x - 1, y);
-                    incrementIfContains(neighborGrid, x + 1, y);
-                    incrementIfContains(neighborGrid, x, y + 1);
-                    incrementIfContains(neighborGrid, x, y - 1);
-                    incrementIfContains(neighborGrid, x - 1, y - 1);
-                    incrementIfContains(neighborGrid, x + 1, y - 1);
-                    incrementIfContains(neighborGrid, x - 1, y + 1);
-                    incrementIfContains(neighborGrid, x + 1, y + 1);
+                    neighborGrid.incrementIfContains(x - 1, y);
+                    neighborGrid.incrementIfContains(x + 1, y);
+                    neighborGrid.incrementIfContains(x, y + 1);
+                    neighborGrid.incrementIfContains(x, y - 1);
+                    neighborGrid.incrementIfContains(x - 1, y - 1);
+                    neighborGrid.incrementIfContains(x + 1, y - 1);
+                    neighborGrid.incrementIfContains(x - 1, y + 1);
+                    neighborGrid.incrementIfContains(x + 1, y + 1);
                 }
             }
         }
@@ -44,12 +44,6 @@ public final class Day4 {
         System.out.println(accessible);
     }
 
-    private static void incrementIfContains(ArrayGrid<Integer> grid, int x, int y) {
-        if (grid.contains(x, y)) {
-            grid.set(x, y, grid.get(x, y) + 1);
-        }
-    }
-
     public static void part2(Stream<String> lines) {
         var map = new CharGrid(lines).map(x -> x == '@');
         int removedTotal = 0;
@@ -57,19 +51,19 @@ public final class Day4 {
 
         do {
             removedNow = 0;
-            ArrayGrid<Integer> neighborGrid = new ArrayGrid<>(map.width(), map.height(), 0);
+            IntGrid neighborGrid = new IntGrid(map.width(), map.height());
 
             for (int x = 0; x < map.width(); x++) {
                 for (int y = 0; y < map.height(); y++) {
                     if (map.get(x, y)) {
-                        incrementIfContains(neighborGrid, x - 1, y);
-                        incrementIfContains(neighborGrid, x + 1, y);
-                        incrementIfContains(neighborGrid, x, y + 1);
-                        incrementIfContains(neighborGrid, x, y - 1);
-                        incrementIfContains(neighborGrid, x - 1, y - 1);
-                        incrementIfContains(neighborGrid, x + 1, y - 1);
-                        incrementIfContains(neighborGrid, x - 1, y + 1);
-                        incrementIfContains(neighborGrid, x + 1, y + 1);
+                        neighborGrid.incrementIfContains(x - 1, y);
+                        neighborGrid.incrementIfContains(x + 1, y);
+                        neighborGrid.incrementIfContains(x, y + 1);
+                        neighborGrid.incrementIfContains(x, y - 1);
+                        neighborGrid.incrementIfContains(x - 1, y - 1);
+                        neighborGrid.incrementIfContains(x + 1, y - 1);
+                        neighborGrid.incrementIfContains(x - 1, y + 1);
+                        neighborGrid.incrementIfContains(x + 1, y + 1);
                     }
                 }
             }

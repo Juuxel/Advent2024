@@ -1,8 +1,8 @@
 package juuxel.advent2025;
 
-import juuxel.advent.ArrayGrid;
 import juuxel.advent.CharGrid;
 import juuxel.advent.Loader;
+import juuxel.advent.LongGrid;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +42,7 @@ public final class Day7 {
     // then summing up the counts along the bottom edge of the manifold.
     public static void part2(Stream<String> lines) {
         CharGrid inputGrid = new CharGrid(lines);
-        ArrayGrid<Long> outputGrid = new ArrayGrid<>(inputGrid.width(), inputGrid.height() + 1, 0L);
+        LongGrid outputGrid = new LongGrid(inputGrid.width(), inputGrid.height() + 1);
         outputGrid.set(inputGrid.rowAt(0).indexOf('S'), 1, 1L);
 
         for (int y = 1; y < inputGrid.height(); y++) {
@@ -51,19 +51,15 @@ public final class Day7 {
                 if (timelinesHere == 0) continue;
 
                 if (inputGrid.getChar(x, y) == '^') {
-                    add(outputGrid, x - 1, y + 1, timelinesHere);
-                    add(outputGrid, x + 1, y + 1, timelinesHere);
+                    outputGrid.add(x - 1, y + 1, timelinesHere);
+                    outputGrid.add(x + 1, y + 1, timelinesHere);
                 } else {
-                    add(outputGrid, x, y + 1, timelinesHere);
+                    outputGrid.add(x, y + 1, timelinesHere);
                 }
             }
         }
 
         long timelineCount = outputGrid.rowAt(inputGrid.height()).stream().mapToLong(Long::longValue).sum();
         System.out.println(timelineCount);
-    }
-
-    private static void add(ArrayGrid<Long> grid, int x, int y, long toAdd) {
-        grid.set(x, y, grid.get(x, y) + toAdd);
     }
 }
