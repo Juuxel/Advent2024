@@ -20,6 +20,9 @@ public final class Advent2025Solutions {
         new AdventGui.Solution("Day 6, part 2", 6, linesToList(Day6::part2)),
         new AdventGui.Solution("Day 7, part 1", 7, lines(Day7::part1)),
         new AdventGui.Solution("Day 7, part 2", 7, lines(Day7::part2)),
+        new AdventGui.Solution("Day 9, part 1", 9, lines(Day9::part1)),
+        new AdventGui.Solution("Day 9, part 2", 9, lines(Day9::part2)),
+        new AdventGui.Solution("Day 9, draw image of puzzle area", 9, lines(Day9::drawImage)),
     };
 
     public static final AdventGui.Year YEAR = new AdventGui.Year(2025, SOLUTIONS);
