@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -23,7 +24,7 @@ public final class Day8 {
     private static List<Pos> parse(Stream<String> lines) {
         return lines.map(line -> {
             var parts = line.split(",", 3);
-            return new Pos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+            return new Pos(Long.parseLong(parts[0]), Long.parseLong(parts[1]), Long.parseLong(parts[2]));
         }).toList();
     }
 
@@ -67,31 +68,65 @@ public final class Day8 {
             }
         }
 
-        int part1 = Arrays.stream(circuits)
+        long part1 = Arrays.stream(circuits)
             .distinct()
             .sorted(Comparator.<Set<?>>comparingInt(Set::size).reversed())
             .limit(3)
-            .mapToInt(Set::size)
+            .mapToLong(Set::size)
             .reduce(1, (a, b) -> a * b);
         System.out.println(part1);
     }
 
+    @SuppressWarnings("unchecked")
     public static void part2(Stream<String> lines) {
+        List<Pos> positions = parse(lines);
+        List<PosPair> pairs = computePairs(positions);
+        pairs.sort(PosPair.COMPARATOR);
+
+        int circuitCount = positions.size();
+        Set<Integer>[] circuits = new Set[positions.size()];
+
+        for (int i = 0; i < positions.size(); i++) {
+            Set<Integer> circuit = new HashSet<>();
+            circuit.add(i);
+            circuits[i] = circuit;
+        }
+
+        Iterator<PosPair> pairIter = pairs.iterator();
+        PosPair last = null;
+        while (circuitCount > 1) {
+            PosPair pair = last = pairIter.next();
+            Set<Integer> circuitA = circuits[pair.indexA];
+            Set<Integer> circuitB = circuits[pair.indexB];
+
+            if (circuitA == circuitB) {
+                continue;
+            }
+
+            circuitCount--;
+            circuitA.addAll(circuitB);
+            for (int index : circuitB) {
+                circuits[index] = circuitA;
+            }
+        }
+
+        long part2 = last.a.x * last.b.x;
+        System.out.println(part2);
     }
 
-    private record Pos(int x, int y, int z) {
-        static int squaredDistance(Pos a, Pos b) {
-            int dx = a.x - b.x;
-            int dy = a.y - b.y;
-            int dz = a.z - b.z;
+    private record Pos(long x, long y, long z) {
+        static long squaredDistance(Pos a, Pos b) {
+            long dx = a.x - b.x;
+            long dy = a.y - b.y;
+            long dz = a.z - b.z;
             return dx * dx + dy * dy + dz * dz;
         }
     }
 
     private record PosPair(int indexA, Pos a, int indexB, Pos b) {
-        static final Comparator<PosPair> COMPARATOR = Comparator.comparingInt(PosPair::squaredDistance);
+        static final Comparator<PosPair> COMPARATOR = Comparator.comparingLong(PosPair::squaredDistance);
 
-        int squaredDistance() {
+        long squaredDistance() {
             return Pos.squaredDistance(a, b);
         }
     }
