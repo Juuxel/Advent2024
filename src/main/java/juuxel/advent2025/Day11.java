@@ -23,33 +23,7 @@ public final class Day11 {
 
     public static void part1(Stream<String> lines) {
         var graph = parse(lines);
-
-        long paths = 0;
-        Queue<List<String>> queue = new ArrayDeque<>();
-        queue.add(List.of("you"));
-
-        while (!queue.isEmpty()) {
-            List<String> pathThusFar = queue.remove();
-            String mostRecentNode = pathThusFar.getLast();
-
-            if (mostRecentNode.equals("out")) {
-                paths++;
-                continue;
-            }
-
-            for (String next : graph.get(mostRecentNode)) {
-                if (pathThusFar.contains(next)) {
-                    // I think this is what they mean by moving backwards
-                    continue;
-                }
-
-                List<String> nextPath = new ArrayList<>(pathThusFar.size() + 1);
-                nextPath.addAll(pathThusFar);
-                nextPath.add(next);
-                queue.add(nextPath);
-            }
-        }
-
+        long paths = countPathsBetween(graph, "you", "out", Set.of());
         System.out.println(paths);
     }
 
@@ -115,7 +89,7 @@ public final class Day11 {
                     fullExclude.addAll(empires.get(i + 1));
                     fullExclude.remove(targetNode);
 
-                    pathsToTarget += pathsTo.get(sourceNode) * countPathsBetween(graph, List.of(sourceNode), List.of(targetNode), fullExclude);
+                    pathsToTarget += pathsTo.get(sourceNode) * countPathsBetween(graph, sourceNode, targetNode, fullExclude);
                 }
 
                 pathsTo.put(targetNode, pathsToTarget);
@@ -237,18 +211,16 @@ public final class Day11 {
         return false;
     }
 
-    private static long countPathsBetween(Map<String, List<String>> graph, List<String> starts, List<String> ends, Set<String> disallowed) {
+    private static long countPathsBetween(Map<String, List<String>> graph, String start, String end, Set<String> disallowed) {
         long paths = 0;
         Queue<List<String>> queue = new ArrayDeque<>();
-        for (String start : starts) {
-            queue.add(List.of(start));
-        }
+        queue.add(List.of(start));
 
         while (!queue.isEmpty()) {
             List<String> pathThusFar = queue.remove();
             String mostRecentNode = pathThusFar.getLast();
 
-            if (ends.contains(mostRecentNode)) {
+            if (mostRecentNode.equals(end)) {
                 paths++;
                 continue;
             }
